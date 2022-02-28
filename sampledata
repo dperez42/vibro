@@ -1,0 +1,29 @@
+    [
+        {"name": "Albert E", "age": "20"}, 
+        {"name": "Ramanujam", "age": "27"}
+    ]
+
+CREATE OR REPLACE FUNCTION public.parse_json_data(
+json)
+RETURNS void
+LANGUAGE 'plpgsql'
+COST 100
+VOLATILE 
+AS $BODY$
+
+BEGIN
+	insert into data_sensors(id_sensor, time_stamp, ax, ay, az, delta_time, ind)
+	select x.id_sensor, now(), x.ax , x.ay, x.az, x.delta_time, x.ind from json_to_recordset($1) x 
+	(
+		id_sensor int,
+		time_stamp timestamp with time zone,
+		ax  double precision,
+		ay  double precision,
+		az  double precision,
+		delta_time double precision,
+		ind smallint
+	);       
+   END;
+$BODY$;
+
+--SELECT public.parse_json_data('[{"id_sensor": "1", "ax": "20", "ay": "10","az": "30", "delta_time": "10000", "ind":"99"}]');

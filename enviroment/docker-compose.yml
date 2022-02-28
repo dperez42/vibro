@@ -1,0 +1,64 @@
+version: '3.8'
+services:
+  #Nginx Service
+  #webserver:
+  #  image: nginx:alpine
+  #  container_name: webserver
+  #  restart: unless-stopped
+  #  tty: true
+  #  ports:
+  #    - "90:80"
+  #    - "443:443"
+  #  volumes:
+  #    - ./front_end:/usr/share/nginx/html
+  #  networks:
+  #    - app-network
+  
+  #Postgres Service
+  db:
+    container_name: pg_container
+    build:
+      context: ./postgress
+      dockerfile: Dockerfile
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: data_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/pg_data:/var/lib/postgresql/data 
+    networks:
+      - app-network
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user@user.com
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - "5050:80"
+    volumes:
+      - ./data/pgadmin_data:/var/lib/pgadmin
+    networks:
+      - app-network
+
+  grafana:
+    image: grafana/grafana-enterprise:8.2.0
+    ports:
+      - 3000:3000
+    volumes:
+      - ./data/grafana_data:/var/lib/grafana
+    networks:
+      - app-network
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
+#Docker Volumes
+#volumes:
+#  db-data:
+#  pgadmin-data:

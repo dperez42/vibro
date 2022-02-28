@@ -1,0 +1,166 @@
+
+Creamos consola para crear nuestro proyecto node
+> npm init -y 
+'-y' say yes to all
+
+Instalar dependencia principales de 
+- express (servidor web)
+- morgan   (poder ver por consola peticiones ... )
+- cors (comunica servidores en diferentes hosts, back end - frond end)
+- pg postgress database
+- dotenv 
+> npm i express morgan cors pg
+instalamos el modulo pg 
+>npm i pg dotenv
+
+
+Instalar dependencias desarrolador
+- nodemon
+> npm i nodemon -D
+
+-D instala nodemon en "devDependencies"
+
+Creo index.js (pagina de inicio)
+Create carpeta routes : Listamos las url que vamos a llamar del frontend
+Create carpeta controllers: código cuando llamamos a una url
+Fichero config.js para variables de entorno junto con .env 
+Fichero postgres.js conexión para base de datos postgres
+
+En index.js
+creamos el servidor
+const express = require('express');
+
+const app = express();
+
+app.listen(3000);                   // start server port 3000
+console.log('Server on port 3000')  // message on screen
+
+En el package.json creo un script personalizado para 
+"start": "node src/index.js"
+
+execute with: > npm start
+Server on port 3000
+
+creamos un nuevo script usando "nodemon" para reiniciar automáticamente cuando realizo cambios.
+"dev": "nodemon src/index.js"
+ejecutamos con > npm run dev
+
+to listen the request 
+>const morgan = require('morgan');
+>app.use(morgan('dev'))
+
+
+
+
+ENDPOINTS, crear url que el front end va a poder utilizar, p.e: crear, ver, borrar, datos....
+
+En task.routes.js
+
+    const { Router } = require('express');
+
+    const router = Router();
+
+    router.get('/',(req, res) => {
+        res.send('Hello world');
+    })
+
+    module.exports = router;
+
+en index.js
+const taskRoutes = require('./routes/task.routes'); ---> to import
+app.use(taskRoutes)     ---> to use it 
+
+
+para hacer get, post etc.. un cliente rest con el modulo Thunder client in visula studio  = postman
+
+CONECTAR CON DASE DE DATOS
+Conectar con nuestra base de datos
+instalamos el modulo pg
+>npm i pg
+
+o microsoft sql server
+>npm i mssql
+
+en fichero postgres.js
+
+
+VARIABLES DE ENTORNO
+Uso de .env para variables de entorno creando un objeto de configuración:
+instalo dotenv
+>npm i dotenv
+
+Creamos el archivo .env para guardar nuestras variables de entorno.
+.env
+    PG_DB_USER = user
+    PG_DB_PASSWORD = password
+    PG_DB_HOST = localhost
+    PG_DB_PORT = 5432
+    PG_DB_DATABASE = taskdb
+
+config.js
+    const {config} = require('dotenv')
+    config({path:__dirname+'\\.env'})     //ruta donde esta .env
+    
+//console.log(process.env.PG_DB_PASSWORD)
+    //console.log(__dirname+'\\.env')
+
+    module.exports = {
+        pg_config: {
+            user: process.env.PG_DB_USER,
+            password: process.env.PG_DB_PASSWORD,
+            host: process.env.PG_DB_HOST,
+            port: process.env.PG_DB_PORT,
+            database: process.env.PG_DB_DATABASE,
+        }
+    }
+
+tip: importante definir el path donde esta .env
+
+en el fichero para uso.
+    const { pg_config } = require('./config');
+    ....
+    password: pg_config.password,
+
+
+USO DE .GITIGNORE
+.gitignore
+
+    # node.js
+    node_modules
+    # variables de entorno
+    .env
+
+
+MANEJO DE ERRORES
+Para el manejo global de ERRORES
+en index.js
+
+app.use(taskRoutes);
+
+CONEXION DEL BACKEND CON EL BACK EN REACT
+comunicar ambos servidores de manera simple
+instalar el modulo CORS
+>npm i express cors
+en index.js
+
+    const cors = require('cors');
+
+    app.use(cors());
+
+
+AUTHENTICATION
+https://jasonwatmore.com/post/2020/08/18/nodejs-mysql-simple-api-for-authentication-registration-and-user-management
+
+Schema validation middleware with joi
+https://jasonwatmore.com/post/2020/07/22/nodejs-express-api-request-schema-validation-with-joi
+install joi
+> npm i joi
+
+install bcryptjs
+npm i bcryptjs
+
+using JSW
+https://www.bezkoder.com/react-node-mongodb-auth/
+
+using Auth0
+https://thecodebarbarian.com/oauth-with-node-js-and-express.html
